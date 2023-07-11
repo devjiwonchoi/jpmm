@@ -2,15 +2,15 @@
 import type { CliArgs } from './types'
 import arg from 'arg'
 import getRootDir from 'root-dir-path'
-import { logger, exit, formatDuration } from './utils'
+import { logger, exit, getCurrentPackageManager, formatDuration } from './utils'
 import { version } from '../package.json'
 
 const helpMessage = `
-Usage: jpmm [options]
+Usage: jpmm migrate npm | yarn | yarn2 | pnpm
 
 Options:
+  -f, --from <name>      specify package manager to migrate from
   -h, --help             output usage information
-  -m, --migrate <name>   start migration to given package manager
   -r, --root <path>      specify root directory path
   -v, --version          output the jpmm version
 `
@@ -23,13 +23,13 @@ function parseCliArgs(argv: string[]) {
   let args: arg.Result<any> | undefined
   args = arg(
     {
+      '--from': String,
       '--help': Boolean,
-      '--migrate': String,
       '--root': String,
       '--version': Boolean,
 
+      '-f': '--from',
       '-h': '--help',
-      '-m': '--migrate',
       '-r': '--root',
       '-v': '--version',
     },
@@ -38,31 +38,34 @@ function parseCliArgs(argv: string[]) {
       argv,
     }
   )
+  const packageManager = args._[0] === 'migrate' ? args._[1] : args._[0]
   const parsedArgs: CliArgs = {
-    name: args['--migrate'],
-    root: args['--root'],
+    packageManager,
+    from: args['--from'],
     help: args['--help'],
+    root: args['--root'],
     version: args['--version'],
   }
   return parsedArgs
 }
 
 async function run(args: CliArgs) {
-  const { name } = args
-  const rootDir = (args.root || getRootDir()) ?? process.cwd()
   const migrate: typeof import('./index').migrate = require('./index').migrate
+  const packageManager = args.packageManager
+  const rootDir = (args.root || getRootDir()) ?? process.cwd()
+  const currentPM = args.from || getCurrentPackageManager(rootDir)
 
   if (args.version) {
     return logger.log(version)
   }
-  if (args.help || !name) {
+  if (args.help || !packageManager) {
     return help()
   }
 
   let timeStart = Date.now()
   let timeEnd
   try {
-    migrate(name!, rootDir)
+    migrate(currentPM, packageManager, rootDir)
     timeEnd = Date.now()
   } catch (err: any) {
     if (err.name === 'NOT_EXISTED') {

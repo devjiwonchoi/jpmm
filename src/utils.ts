@@ -1,5 +1,7 @@
-import fs from 'fs/promises'
+import fs from 'fs'
+import fsp from 'fs/promises'
 import path from 'path'
+import { lockFiles } from './constants'
 import type { PackageMetadata } from './types'
 
 export function exit(err: string | Error) {
@@ -19,7 +21,7 @@ export async function getPackageMeta(cwd: string): Promise<PackageMetadata> {
   let targetPackageJson = {}
   try {
     targetPackageJson = JSON.parse(
-      await fs.readFile(pkgFilePath, { encoding: 'utf-8' })
+      await fsp.readFile(pkgFilePath, { encoding: 'utf-8' })
     )
   } catch (_) {}
 
@@ -47,7 +49,7 @@ export function isTypescriptFile(filename: string): boolean {
 
 export async function fileExists(filePath: string) {
   try {
-    await fs.access(filePath)
+    await fsp.access(filePath)
     return true
   } catch (err: any) {
     if (err.code === 'ENOENT') {
@@ -112,3 +114,13 @@ export function filenameWithoutExtension(file: string | undefined) {
 }
 
 export const nonNullable = <T>(n?: T): n is T => Boolean(n)
+
+export function getCurrentPackageManager(rootDir: string) {
+  const filenames = fs.readdirSync(rootDir)
+  const lockFile = filenames.find((filename) =>
+    Object.keys(lockFiles).includes(filename)
+  )
+  // get value from lockFiles by key: lockFile
+
+  return lockFiles[lockFile as keyof typeof lockFiles]
+}

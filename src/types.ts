@@ -36,9 +36,11 @@ type PackageMetadata = {
   exports?: string | Record<string, ExportCondition>
   types?: string
   typings?: string
+  workspaces?: string[]
 }
 type CliArgs = {
-  name?: string
+  packageManager: string
+  from?: string
   root?: string
   help?: boolean
   version?: boolean
