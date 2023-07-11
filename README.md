@@ -5,8 +5,10 @@ Seamless Migration Tool for JavaScript Package Managers
 ### Usage:
 
 ```bash
-$ jpmm migrate <package-manager> [options]
+$ npx jpmm migrate <package-manager> [options]
 ```
+
+#### Note: The command `migrate` can be ommited.
 
 ### Options:
 
@@ -20,16 +22,23 @@ $ jpmm migrate <package-manager> [options]
 #### `--from`:
 
 ```bash
-$ jpmm migrate <package-manager> --from <current-package-manager>
+$ npx jpmm migrate <package-manager> --from <current-package-manager>
 ```
 
 #### `--root`:
 
 ```bash
-$ jpmm migrate <package-manager> --root <root-directory-path>
+$ npx jpmm migrate <package-manager> --root <root-directory-path>
 ```
 
-#### Note: Theseptions will reduce the amount of time it takes to migrate.
+#### Note: These options will reduce the amount of time it takes to migrate.
+
+### Example:
+
+```bash
+$ npx jpmm pnpm -f yarn -r ./my-project
+```
+
 
 ### Supported Package Managers:
 
