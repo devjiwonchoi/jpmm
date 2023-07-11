@@ -1,7 +1,7 @@
 {
   "name": "jpmm",
   "version": "0.0.0",
-  "description": "Easy migration between JavaScript Package Managers",
+  "description": "Seamless Migration Tool for JavaScript Package Managers",
   "bin": {
     "jpmm": "./dist/cli.js"
   },
